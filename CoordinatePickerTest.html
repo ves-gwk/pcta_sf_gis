@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Coordinate Picker Test</title>
+  <meta name="description" content="Galen">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+   <!-- two below are for locate control -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+   <!-- custom css -->
+   <link rel="stylesheet" href="CoordinatePickerTest.css"/>
+</head>
+<body>
+  <div id="mymap"></div>
+  <div id="info-pane" class="leaflet-bar">
+  <label>
+    Click on the map to add an start/end point<br>
+    Click on a marker to remove it.
+    <select id="symbols">
+      <option value="PCT Point">PCT Point</option>
+      <option value="Side Trail Point">Side Trail Point</option>
+    </select>
+  </label>
+</div>
+</body>
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+ integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+ crossorigin=""></script>
+ <!-- Load Esri Leaflet from CDN.  it has no .css stylesheet of its own, only .js -->
+<script src="https://unpkg.com/esri-leaflet@3.0.1/dist/esri-leaflet.js"
+  integrity="sha512-JmpptMCcCg+Rd6x0Dbg6w+mmyzs1M7chHCd9W8HPovnImG2nLAQWn3yltwxXRM7WjKKFFHOAKjjF2SC4CgiFBg=="
+  crossorigin=""></script>
+<!-- Load L.Control.locate from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet.locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+<!-- custom js -->
+<script src="CoordinatePickerTest.js"></script>
+</html>
