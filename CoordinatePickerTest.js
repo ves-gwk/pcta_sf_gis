@@ -132,12 +132,13 @@ currentMarkers = {}
     }
  });
 function addRemoveMarker(event, currentMarkers, layerName) {
-// if start and end selected and clicked map again start over
+// if start and end added and clicked map again start over
     if (currentMarkers.start && currentMarkers.end) {
       currentMarkers.start.remove();
       currentMarkers.end.remove();
       currentMarkers.start = null;
-      currentMarkers.end = null;      
+      currentMarkers.end = null;
+      console.log("reset start/end")      
     }
     // Add different icon per type
     if (layerName == "PCT Point"){
@@ -153,24 +154,31 @@ function addRemoveMarker(event, currentMarkers, layerName) {
     }
 
     // assign the marker to start/stop depending on state 
-    if (currentMarkers.start == null)
+    if (currentMarkers.start == null){
       currentMarkers.start = feat;
+      console.log("set to start")
+    }
     else if (currentMarkers.end == null) {
       currentMarkers.end = feat;
+      console.log("set to end")
     }
     feat.on('click', function(e) {
       // track the state of removal. we prob wanna use ids from the markers to target them
+      // if start is filled in and end isn't, start over
       if (currentMarkers.start && currentMarkers.end == null) {
         currentMarkers.start.remove();
-        currentMarkers.end.remove();
+        // currentMarkers.end.remove();
         currentMarkers.start = null;
         currentMarkers.end = null;
+        console.log("start filled in, end is not. reset both")
       } 
+      // otherwise just reset end, keep the start
       else{
         currentMarkers.end.remove();
-        currentMarkers.end = null;  
+        currentMarkers.end = null;
+        console.log("start filled in, end is too. keep the start")
       }
-      e.remove();
+      // e.remove();
     });
 }
 // pct_centerline.on("click", function(e) {
