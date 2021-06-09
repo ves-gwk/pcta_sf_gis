@@ -24,109 +24,81 @@
       fillOpacity: 0.5
     }
   }).addTo(mymap);
-  var selectControl = new L.Control.LineStringSelect({});
-  mymap.addControl(selectControl);
-  // mymap.on('load', function(e) {
-  //   console.log(e);
-  // });
 
-  // pct_centerline.on('click', function(e){
-  //   console.log(e);
-  //   var id = e.layer.feature.id
-  //   var feature = pct_centerline.getFeature(id)
-  //   console.log(feature);
-  //   var lat_lngs = feature.getLatLngs()
-  //   console.log(lat_lngs);
-  //   var clicked = L.point(e.layerPoint)
-  //   var near_pt = e.layer.closestLayerPoint(clicked)
-  //   console.log(near_pt);
-  //   selectControl.enable({
-  //     feature: e.layer.feature,
-  //     layer: e.layer
-  //   });
-  // });
-  pct_centerline.on('createfeature', function(e){
-    console.log(e);
-    var layer = e.target._layers[1]
-    var feature = e.feature
-    selectControl.enable({
-      feature: feature,
-      layer: layer
-    });
-  });
+  // // // Add PCT Centerline Tile FS
+  // const pct_centerline = L.esri.Vector.vectorTileLayer('e45ba22506a144428abf9fd92a8e5755').addTo(mymap);
+
   // Add Side Trails
   const side_trails = L.esri.featureLayer({
     url: 'https://services5.arcgis.com/ZldHa25efPFpMmfB/arcgis/rest/services/Halfmile_Line_2018/FeatureServer/1',
     color: 'black'
   }).addTo(mymap);
 
-// currentMarkers = {}
+  var selectControl = new L.Control.LineStringSelect({});
+  mymap.addControl(selectControl);
+  var selectControlSide = new L.Control.LineStringSelect({});
+  mymap.addControl(selectControlSide);
 
-//  var myIcon = L.divIcon();
-// // you can set .my-div-icon styles in CSS
-//  currentMarkersPCT = {}
-//  currentMarkersSide = {}
-//  mymap.on('click', function (e) {
-//     var _select   = document.getElementById("symbols");
-//     var _val      = _select.value;
-//     var layerName = _select.options[_select.selectedIndex].text;
-//     console.log("layer: ", layerName);
-//     if (layerName == "PCT Point"){
-//         addRemoveMarker(e, currentMarkersPCT, layerName)
-//     }
-//     else {
-//         addRemoveMarker(e, currentMarkersSide, layerName)
-//     }
-//  });
-// function addRemoveMarker(event, currentMarkers, layerName) {
-// // if start and end added and clicked map again start over
-//     if (currentMarkers.start && currentMarkers.end) {
-//       currentMarkers.start.remove();
-//       currentMarkers.end.remove();
-//       currentMarkers.start = null;
-//       currentMarkers.end = null;
-//       console.log("reset start/end")      
-//     }
-//     // Add different icon per type
-//     if (layerName == "PCT Point"){
-//         var feat = L.marker(event.latlng, {
-//         draggable: true
-//     }).addTo(mymap)
-//     }
-//     else{
-//         var feat = L.marker(event.latlng, {
-//         draggable: true,
-//         icon: myIcon
-//     }).addTo(mymap)
-//     }
+// Set hover style for both layers
+// pct_centerline.on('mouseover', function(e){
+//     setOnHover(e)
+//   });
+// side_trails.on('mouseover', function(e){
+//     setOnHover(e)
+//   });
 
-//     // assign the marker to start/stop depending on state 
-//     if (currentMarkers.start == null){
-//       currentMarkers.start = feat;
-//       console.log("set to start")
-//     }
-//     else if (currentMarkers.end == null) {
-//       currentMarkers.end = feat;
-//       console.log("set to end")
-//     }
-//     feat.on('click', function(e) {
-//       // track the state of removal. we prob wanna use ids from the markers to target them
-//       // if start is filled in and end isn't, start over
-//       if (currentMarkers.start && currentMarkers.end == null) {
-//         currentMarkers.start.remove();
-//         // currentMarkers.end.remove();
-//         currentMarkers.start = null;
-//         currentMarkers.end = null;
-//         console.log("start filled in, end is not. reset both")
-//       } 
-//       // otherwise just reset end, keep the start
-//       else{
-//         currentMarkers.end.remove();
-//         currentMarkers.end = null;
-//         console.log("start filled in, end is too. keep the start")
-//       }
-//       // e.remove();
-//     });
-// }
+// Enable layer control for both layers
+pct_centerline.on('click', function(e){
+  enableLayerControl(selectControl, e)
+});
+side_trails.on('click', function(e){
+  enableLayerControl(selectControlSide, e)
+});
+  function setOnHover(e){
+    console.log(e);
+    var layer = e.target
+
+    layer.setStyle({
+        color: '#0ff',
+        opacity: 1,
+        weight: 2
+      });
+    layer.on('mouseout', function(){
+      layer.setStyle({
+        color: '#FF00FF',
+        weight: 2,
+        opacity: 0.85,
+        fillOpacity: 0.5
+      })
+    });
+  }
+
+  function enableLayerControl(layer_control, event){
+      layer_control.enable({
+        feature: event.layer.feature,
+        layer: event.layer
+      });
+  };
+  // // On click for PCT Centerline, initialize the line string select control
+  // pct_centerline.on('click', function(e){
+  //   // console.log(e);
+  //   var id = e.layer.feature.id
+  //   var feature = pct_centerline.getFeature(id)
+  //   selectControl.enable({
+  //     feature: e.layer.feature,
+  //     layer: e.layer
+  //   });
+  // });
+
+  // // On click for Side Trails, intitialize another line string select control
+  // side_trails.on('click', function(e){
+  //   // console.log(e);
+  //   var id = e.layer.feature.id
+  //   var feature = side_trails.getFeature(id)
+  //   selectControlSide.enable({
+  //     feature: e.layer.feature,
+  //     layer: e.layer
+  //   });
+  // });
 
 })();
