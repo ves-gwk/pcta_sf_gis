@@ -16,10 +16,9 @@
   // Add PCT Centerline FS
   const pct_centerline = L.esri.featureLayer({
     url: 'https://services5.arcgis.com/ZldHa25efPFpMmfB/ArcGIS/rest/services/PCTA_Centerline/FeatureServer/0',
-    color: 'red',
     style: {
       color: '#FF00FF',
-      weight: 2,
+      weight: 3,
       opacity: 0.85,
       fillOpacity: 0.5
     }
@@ -46,13 +45,17 @@
 // side_trails.on('mouseover', function(e){
 //     setOnHover(e)
 //   });
-
+var pct_click_count = 0
+var side_click_count = 0
 // Enable layer control for both layers
 pct_centerline.on('click', function(e){
-  enableLayerControl(selectControl, e)
+  enableLayerControl(selectControl, e, pct_click_count)
+  pct_click_count++
+  console.log(pct_click_count)
 });
 side_trails.on('click', function(e){
-  enableLayerControl(selectControlSide, e)
+  enableLayerControl(selectControlSide, e, side_click_count)
+  side_click_count++
 });
   function setOnHover(e){
     console.log(e);
@@ -73,11 +76,23 @@ side_trails.on('click', function(e){
     });
   }
 
-  function enableLayerControl(layer_control, event){
+// save the geojson
+// this is probably where stuff will get written to SF database
+  document.getElementById('save-button').onclick = function(){
+      console.log("button clicked")
+      var pct_geojson = selectControl.toGeoJSON()
+      var side_geojson = selectControlSide.toGeoJSON()
+      console.log(pct_geojson)
+      console.log(side_geojson)
+  }
+
+  function enableLayerControl(layer_control, event, clicks){
+    if (clicks == 0){
       layer_control.enable({
         feature: event.layer.feature,
         layer: event.layer
       });
+    } else {console.log("already clicked once")};
   };
   // // On click for PCT Centerline, initialize the line string select control
   // pct_centerline.on('click', function(e){
