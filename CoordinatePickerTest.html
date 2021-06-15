@@ -18,13 +18,14 @@
   <div id="info-pane" class="leaflet-bar">
   <label>
     Click on the PCT to start selecting a segment of trail<br>
-    Click to set the start location, and again to select the end location<br>
-    The segment will be highlighted. <br>
-    Click and drag the start and end markers to refine your segment.<br>
+    Click to set the start / end locations<br>
+    The segment will be highlighted<br>
+    Click and drag the start / end markers to refine your segment.<br>
     Repeat this process for a side trail, if applicable.<br>
     When finished, 
   </label>
-  <button id="save-button">Save Segments</button>
+  <button id="save-button">Save Segments</button><br>
+  <button id="clear-button">Clear Segments</button>
 </div>
 </body>
 <!-- Make sure you put this AFTER Leaflet's CSS -->
@@ -35,8 +36,6 @@
 <script src="https://unpkg.com/esri-leaflet@3.0.1/dist/esri-leaflet.js"
   integrity="sha512-JmpptMCcCg+Rd6x0Dbg6w+mmyzs1M7chHCd9W8HPovnImG2nLAQWn3yltwxXRM7WjKKFFHOAKjjF2SC4CgiFBg=="
   crossorigin=""></script>
-  <!-- Load Esri Leaflet Vector -->
-  <script src="https://unpkg.com/esri-leaflet-vector@3/dist/esri-leaflet-vector.js"></script>
   <!-- Add LineStringSelect plugin -->
 <script src="C:\repos\L.Control.LineStringSelect\dist\L.Control.LineStringSelect.min.js"></script>
 <!-- custom js -->

@@ -33,6 +33,7 @@
     color: 'black'
   }).addTo(mymap);
 
+  // Add two different controls, one for PCT and one for side trails
   var selectControl = new L.Control.LineStringSelect({});
   mymap.addControl(selectControl);
   var selectControlSide = new L.Control.LineStringSelect({});
@@ -47,53 +48,94 @@
 //   });
 var pct_click_count = 0
 var side_click_count = 0
+var selectControlEnabled = false
+var selectControlSideEnabled = false
 // Enable layer control for both layers
 pct_centerline.on('click', function(e){
   enableLayerControl(selectControl, e, pct_click_count)
   pct_click_count++
-  console.log(pct_click_count)
 });
 side_trails.on('click', function(e){
   enableLayerControl(selectControlSide, e, side_click_count)
   side_click_count++
 });
-  function setOnHover(e){
-    console.log(e);
-    var layer = e.target
+  // function setOnHover(e){
+  //   console.log(e);
+  //   var layer = e.target
 
-    layer.setStyle({
-        color: '#0ff',
-        opacity: 1,
-        weight: 2
-      });
-    layer.on('mouseout', function(){
-      layer.setStyle({
-        color: '#FF00FF',
-        weight: 2,
-        opacity: 0.85,
-        fillOpacity: 0.5
-      })
-    });
-  }
+  //   layer.setStyle({
+  //       color: '#0ff',
+  //       opacity: 1,
+  //       weight: 2
+  //     });
+  //   layer.on('mouseout', function(){
+  //     layer.setStyle({
+  //       color: '#FF00FF',
+  //       weight: 2,
+  //       opacity: 0.85,
+  //       fillOpacity: 0.5
+  //     })
+  //   });
+  // }
 
 // save the geojson
 // this is probably where stuff will get written to SF database
   document.getElementById('save-button').onclick = function(){
-      console.log("button clicked")
+      console.log("save button clicked")
       var pct_geojson = selectControl.toGeoJSON()
       var side_geojson = selectControlSide.toGeoJSON()
       console.log(pct_geojson)
       console.log(side_geojson)
-  }
-
+  };
+  document.getElementById('clear-button').onclick = function(){
+    clearButton(selectControlEnabled, selectControlSideEnabled);
+  };
+  
+  function clearButton(enabled, side_enabled){
+    console.log("clear button clicked")
+      console.log(enabled)
+      if (enabled){
+        selectControl.disable(); 
+        selectControlEnabled = false
+        pct_click_count = 0
+      } 
+      else{console.log("no pct line to reset")}
+      if (side_enabled){
+        selectControlSide.disable();
+        selectControlSideEnabled = false
+        side_click_count = 0
+      } 
+      else{console.log("no side trails to reset")}
+  };
   function enableLayerControl(layer_control, event, clicks){
     if (clicks == 0){
       layer_control.enable({
         feature: event.layer.feature,
         layer: event.layer
       });
+      if (layer_control == selectControl){selectControlEnabled = true}
+      if (layer_control == selectControlSide){selectControlSideEnabled = true}
+      
+      // put a listener on the selection finished
+      // zoom to the selected line the first time it's set
+      var i = 0
+        layer_control.on('selection', function(){
+          if (i==0){
+            zoomToSelected(layer_control)
+            i++
+            console.log(i)
+          }
+        });
     } else {console.log("already clicked once")};
   };
+  function zoomToSelected(layer_control){
+    // get the selection lat lons
+    selection = layer_control.getSelection()
+    // console.log(selection)
+    selection_polyline = L.polyline(selection)
+    // zoom to the line
+    mymap.fitBounds(selection_polyline.getBounds())
+  }
   // // On click for PCT Centerline, initialize the line string select control
   // pct_centerline.on('click', function(e){
   //   // console.log(e);
