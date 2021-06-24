@@ -6,8 +6,10 @@
    console.log("Loaded: ", container);
 
   const mymap = L.map('mymap', {
-      center: [40.54, -122.277],
-      zoom: 5
+      // center: [40.54, -122.277],
+      // zoom: 5
+      center: [42.944, -122.108],
+      zoom: 10
   });
 
   // Add basemap
@@ -33,60 +35,53 @@
     color: 'black'
   }).addTo(mymap);
 
+  const sf_edit_segments = L.esri.featureLayer({
+    url: 'https://services5.arcgis.com/ZldHa25efPFpMmfB/arcgis/rest/services/SalesforceSegments/FeatureServer/0'
+  }).addTo(mymap);
+  console.log(sf_edit_segments)
+
   // Add two different controls, one for PCT and one for side trails
   var selectControl = new L.Control.LineStringSelect({});
   mymap.addControl(selectControl);
   var selectControlSide = new L.Control.LineStringSelect({});
   mymap.addControl(selectControlSide);
 
-// Set hover style for both layers
-// pct_centerline.on('mouseover', function(e){
-//     setOnHover(e)
-//   });
-// side_trails.on('mouseover', function(e){
-//     setOnHover(e)
-//   });
-var pct_click_count = 0
-var side_click_count = 0
-var selectControlEnabled = false
-var selectControlSideEnabled = false
-// Enable layer control for both layers
-pct_centerline.on('click', function(e){
-  enableLayerControl(selectControl, e, pct_click_count)
-  pct_click_count++
-});
-side_trails.on('click', function(e){
-  enableLayerControl(selectControlSide, e, side_click_count)
-  side_click_count++
-});
-  // function setOnHover(e){
-  //   console.log(e);
-  //   var layer = e.target
+  // Get divs for putting lengths in
+  var pct_length_div = document.getElementById('pct-length')
+  var side_length_div = document.getElementById('side-trail-length')
 
-  //   layer.setStyle({
-  //       color: '#0ff',
-  //       opacity: 1,
-  //       weight: 2
-  //     });
-  //   layer.on('mouseout', function(){
-  //     layer.setStyle({
-  //       color: '#FF00FF',
-  //       weight: 2,
-  //       opacity: 0.85,
-  //       fillOpacity: 0.5
-  //     })
-  //   });
-  // }
+  // Set click and enabled variables for use in functions on click
+  var pct_click_count = 0
+  var side_click_count = 0
+  var selectControlEnabled = false
+  var selectControlSideEnabled = false
+  // Enable layer control for both layers
+  pct_centerline.on('click', function(e){
+    enableLayerControl(selectControl, e, pct_click_count)
+    pct_click_count++
+  });
+  side_trails.on('click', function(e){
+    enableLayerControl(selectControlSide, e, side_click_count)
+    side_click_count++
+  });
 
-// save the geojson
-// this is probably where stuff will get written to SF database
+  // Info button
+  document.getElementById('info-button').onclick = function(){
+    helpcontent = document.getElementById('help-content')
+    helpcontent.classList.toggle('show')
+    };
+  // Save button
+  // this is probably where stuff will get written to SF database (and into Hosted Feature Service)
   document.getElementById('save-button').onclick = function(){
-      console.log("save button clicked")
-      var pct_geojson = selectControl.toGeoJSON()
-      var side_geojson = selectControlSide.toGeoJSON()
-      console.log(pct_geojson)
-      console.log(side_geojson)
+      if(selectControlEnabled){
+        saveButton(selectControl);
+      }
+      if(selectControlSideEnabled){
+        saveButton(selectControlSide);
+      }       
   };
+
+  // Clear button
   document.getElementById('clear-button').onclick = function(){
     clearButton(selectControlEnabled, selectControlSideEnabled);
   };
@@ -107,14 +102,50 @@ side_trails.on('click', function(e){
       } 
       else{console.log("no side trails to reset")}
   };
+  function saveButton(select_control){
+    console.log("save button clicked")
+      var line_geojson = select_control.toGeoJSON()
+      var feature = {
+        type: 'Feature',
+        id: 0,
+        geometry: line_geojson.geometry,
+        properties: {
+          // This will be pulled from Salesforce RecordID field
+          recordID: '01234'
+        }
+      };
+      
+      // feature = L.esri.Util.geojsonToArcGIS(line_geojson)
+      console.log(feature)
+      // line_feature = L.geoJSON.asFeature(line_geojson)
+      // line_feature = line_geojson.asFeature(line_geojson)
+      sf_edit_segments.addFeature(feature, function (err, response) {
+        if (err) {
+          console.log("There was an error...")
+          console.log(err)
+          return;
+        }
+        console.log("successfully added feature");
+        console.log(response)
+      }); 
+            // mymap.openPopup("Total Distance: " + totalDistanceMiles, previousPoint)
+  }
   function enableLayerControl(layer_control, event, clicks){
     if (clicks == 0){
       layer_control.enable({
         feature: event.layer.feature,
         layer: event.layer
       });
-      if (layer_control == selectControl){selectControlEnabled = true}
-      if (layer_control == selectControlSide){selectControlSideEnabled = true}
+      if (layer_control == selectControl){
+        selectControlEnabled = true
+        update_div = pct_length_div
+        update_text = "PCT Total Length: "
+      }
+      if (layer_control == selectControlSide){
+        selectControlSideEnabled = true
+        update_div = side_length_div
+        update_text = "Side Trail Total Length: "
+      }
       
       // put a listener on the selection finished
       // zoom to the selected line the first time it's set
@@ -125,6 +156,18 @@ side_trails.on('click', function(e){
             i++
             console.log(i)
           }
+        var coords = layer_control.getSelection()
+          var previousPoint = null
+          var totalDistance = 0.0000
+          coords.forEach(function (latLng) {
+            if (previousPoint) {
+              totalDistance += previousPoint.distanceTo(latLng)
+            }
+            previousPoint = latLng;
+          });
+          totalDistanceMiles = totalDistance * 0.000621371
+          totalDistanceMiles = totalDistanceMiles.toFixed(3);
+          update_div.textContent = update_text + totalDistanceMiles
         });
     } else {console.log("already clicked once")};
   };
@@ -133,29 +176,10 @@ side_trails.on('click', function(e){
     selection = layer_control.getSelection()
     // console.log(selection)
     selection_polyline = L.polyline(selection)
-    // zoom to the line
+    // zoom to the line, but not too far in
     mymap.fitBounds(selection_polyline.getBounds())
+    mymap.zoomOut()
   }
-  // // On click for PCT Centerline, initialize the line string select control
-  // pct_centerline.on('click', function(e){
-  //   // console.log(e);
-  //   var id = e.layer.feature.id
-  //   var feature = pct_centerline.getFeature(id)
-  //   selectControl.enable({
-  //     feature: e.layer.feature,
-  //     layer: e.layer
-  //   });
-  // });
 
-  // // On click for Side Trails, intitialize another line string select control
-  // side_trails.on('click', function(e){
-  //   // console.log(e);
-  //   var id = e.layer.feature.id
-  //   var feature = side_trails.getFeature(id)
-  //   selectControlSide.enable({
-  //     feature: e.layer.feature,
-  //     layer: e.layer
-  //   });
-  // });
 
 })();

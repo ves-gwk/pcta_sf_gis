@@ -16,17 +16,24 @@
 <body>
   <div id="mymap"></div>
   <div id="info-pane" class="leaflet-bar">
-  <label>
-    Click on the PCT to start selecting a segment of trail<br>
-    Click to set the start / end locations<br>
-    The segment will be highlighted<br>
-    Click and drag the start / end markers to refine your segment.<br>
-    Repeat this process for a side trail, if applicable.<br>
-    When finished, 
-  </label>
+    <button id = "info-button">Click here for instructions</button><br>
+    <div class = "popup">
+      <span id = "help-content" class = "popuptext">
+        Click on the PCT to start selecting a segment of trail<br>
+        Click to set the start / end locations<br>
+        The segment will be highlighted<br>
+        Click and drag the start / end markers to refine your segment<br>
+        Repeat this process for a side trail, if applicable<br>
+        When finished, click the Save Button
+      </span>
+    </div>
   <button id="save-button">Save Segments</button><br>
-  <button id="clear-button">Clear Segments</button>
+  <button id="clear-button">Clear Segments</button><br><br>
+  <div id = "pct-length">PCT Total Length: </div><br>
+  <div id = 'side-trail-length'>Side Trail Total Length: </div>
 </div>
+
+
 </body>
 <!-- Make sure you put this AFTER Leaflet's CSS -->
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
