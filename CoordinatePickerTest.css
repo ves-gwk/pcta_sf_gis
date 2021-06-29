@@ -1,18 +1,24 @@
 /**
- * Created by drewpiston on 10/20/2020.
+ * Created by Galen Keily 06/2021
  */
+/*Can probably defer to many salesforce styles once this is a LWC*/
+button {
+    background-color: #007377;
+    color: white;
+    border-radius: 4px;
+}
+
+#save-button, #clear-button {
+    display: inline-block;
+    margin-right: 10px;
+    margin-top: 10px;
+ }
  .popup {
   position: relative;
-  display: inline-block;
-  cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 .popup .popuptext {
     visibility: hidden;
-    width: 160px;
+    width: 200px;
   background-color: #555;
   color: #fff;
   text-align: left;
@@ -60,7 +66,7 @@
     z-index: 400;
     padding: 1em;
     background: white;
-    text-align: left;
+    /*text-align: left;*/
     max-width: 300px;
     min-width: 250px;
   }
